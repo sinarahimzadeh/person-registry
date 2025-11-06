@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: person-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: person_registry
+      MYSQL_USER: registry
+      MYSQL_PASSWORD: registry
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/1_init.sql:ro
+    command: ["--default-authentication-plugin=mysql_native_password"]
