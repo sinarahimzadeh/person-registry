@@ -1,3 +1,4 @@
+package com.personregistry.backend;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,7 +14,6 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // This links each address to a person’s tax code (foreign key)
     @Column(name = "person_tax_code", length = 16, nullable = false, unique = true)
     private String personTaxCode;
 
