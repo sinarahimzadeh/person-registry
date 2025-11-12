@@ -1,11 +1,15 @@
-package com.personregistry.backend;
+package com.personregistry.model.persistence;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "pr_address")
+@Table(name = "pr_address",
+       uniqueConstraints = @UniqueConstraint(
+           name = "uk_address_fields",
+           columnNames = {"street","street_no","city","province","country"}
+       ))
 @Getter
 @Setter
 public class Address {
@@ -13,9 +17,6 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "person_tax_code", length = 16, nullable = false, unique = true)
-    private String personTaxCode;
 
     @Column(nullable = false)
     private String street;
