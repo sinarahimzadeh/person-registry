@@ -27,11 +27,11 @@ public class PersonController {
         return service.get(taxCode);
     }
 
-    @GetMapping
-    public List<PersonDto> list() {
-        return service.list();
-    }
 
+    @GetMapping("/search")
+    public List<PersonDto> searchByName(@RequestParam("name") String name) {
+        return service.searchByName(name);
+    }
     @PutMapping("/{taxCode}")
     public void update(@PathVariable String taxCode, @RequestBody PersonDto dto) {
         service.update(taxCode, dto);

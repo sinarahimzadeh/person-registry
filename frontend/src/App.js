@@ -9,6 +9,8 @@ export default function App() {
   const [cf, setCf] = useState("");
   const [person, setPerson] = useState(null);
   const [msg, setMsg] = useState("");
+const [nameQuery, setNameQuery] = useState("");
+const [nameResults, setNameResults] = useState([]);
 
   // CREATE
   const [form, setForm] = useState({
@@ -47,6 +49,28 @@ export default function App() {
   };
 
   // ---- SEARCH ----
+  const handleSearchByName = async () => {
+  const q = nameQuery.trim();
+  if (!q) {
+    setMsg("Enter a name or surname to search.");
+    setNameResults([]);
+    return;
+  }
+
+  try {
+    const res = await api.get("/person/search", { params: { name: q } });
+    setNameResults(res.data);
+    if (res.data.length === 0) {
+      setMsg("No persons found with that name.");
+    } else {
+      setMsg("");
+    }
+  } catch (e) {
+    console.error("Search by name error", e);
+    setMsg("Search by name failed.");
+    setNameResults([]);
+  }
+};
   const handleSearch = async () => {
     const raw = cf.trim();
     if (!isValidCF(raw)) {
@@ -200,6 +224,45 @@ export default function App() {
           {msg}
         </p>
       )}
+<h3>Search by Name / Surname</h3>
+<input
+  value={nameQuery}
+  onChange={(e) => setNameQuery(e.target.value)}
+  placeholder="Enter name or surname"
+  style={{ marginRight: 8 }}
+/>
+<button onClick={handleSearchByName}>Search by name</button>
+
+{nameResults.length > 0 && (
+  <div style={{ marginTop: 12 }}>
+    <b>Matches:</b>
+    <ul>
+      {nameResults.map((p) => (
+        <li key={p.taxCode}>
+          <span
+            style={{ cursor: "pointer", textDecoration: "underline" }}
+            onClick={() => {
+              // when you click a result, load it into the main detail view
+              setPerson(p);
+              setCf(p.taxCode);
+              setEdit({
+                name: p.name,
+                surname: p.surname,
+                street: p.address.street,
+                streetNo: p.address.streetNo,
+                city: p.address.city,
+                province: p.address.province,
+                country: p.address.country,
+              });
+            }}
+          >
+            {p.taxCode} – {p.name} {p.surname} ({p.address.city})
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
 
       {person && (
         <div style={{ marginTop: 16, padding: 12, border: "1px solid #ddd", width: 500 }}>

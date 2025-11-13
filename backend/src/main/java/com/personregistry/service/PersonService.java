@@ -6,12 +6,13 @@ import com.personregistry.model.persistence.Address;
 import com.personregistry.model.persistence.Person;
 import com.personregistry.repository.AddressRepository;
 import com.personregistry.repository.PersonRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.LazyInitializationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class PersonService {
     private final PersonRepository personRepository;
     private final AddressRepository addressRepository;
 
+    // CREATE
     @Transactional
     public void create(PersonDto dto) {
         String cf = dto.getTaxCode().toUpperCase();
@@ -35,22 +37,41 @@ public class PersonService {
         personRepository.save(p);
     }
 
+    // GET BY CF
     @Transactional(readOnly = true)
     public PersonDto get(String taxCode) {
         String cf = taxCode.toUpperCase();
         Person p = personRepository.findByTaxCode(cf);
         if (p == null) throw new RuntimeException("Not found");
-        return toDto(p);
+        return toDtoSafe(p);
     }
 
+    // LIST ALL
     @Transactional(readOnly = true)
     public List<PersonDto> list() {
         return personRepository.findAll()
                 .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+                .map(this::toDtoSafe)
+                .toList();
     }
 
+    // SEARCH BY NAME OR SURNAME (contains, case-insensitive)
+    @Transactional(readOnly = true)
+    public List<PersonDto> searchByName(String name) {
+        String q = name == null ? "" : name.trim().toLowerCase();
+        if (q.isEmpty()) return List.of();
+
+        return personRepository.findAll().stream()
+                .filter(p -> {
+                    String n = p.getName() == null ? "" : p.getName().toLowerCase();
+                    String s = p.getSurname() == null ? "" : p.getSurname().toLowerCase();
+                    return n.contains(q) || s.contains(q);
+                })
+                .map(this::toDtoSafe)
+                .toList();
+    }
+
+    // UPDATE (CF is immutable)
     @Transactional
     public void update(String taxCode, PersonDto dto) {
         String cf = taxCode.toUpperCase();
@@ -62,6 +83,7 @@ public class PersonService {
         personRepository.save(p);
     }
 
+    // DELETE
     @Transactional
     public void delete(String taxCode) {
         String cf = taxCode.toUpperCase();
@@ -71,6 +93,7 @@ public class PersonService {
         }
     }
 
+    // HELPER: find or create address
     private Address findOrCreate(AddressDto a) {
         String province = a.getProvince() == null ? null : a.getProvince().toUpperCase();
         return addressRepository
@@ -87,21 +110,26 @@ public class PersonService {
                 });
     }
 
-    private PersonDto toDto(Person p) {
+    // HELPER: safe DTO mapping (ignores broken/lazy address)
+    private PersonDto toDtoSafe(Person p) {
         PersonDto dto = new PersonDto();
         dto.setTaxCode(p.getTaxCode());
         dto.setName(p.getName());
         dto.setSurname(p.getSurname());
 
-        Address a = p.getAddress();
-        if (a != null) {
-            AddressDto ad = new AddressDto();
-            ad.setStreet(a.getStreet());
-            ad.setStreetNo(a.getStreetNo());
-            ad.setCity(a.getCity());
-            ad.setProvince(a.getProvince());
-            ad.setCountry(a.getCountry());
-            dto.setAddress(ad);
+        try {
+            Address a = p.getAddress();
+            if (a != null) {
+                AddressDto ad = new AddressDto();
+                ad.setStreet(a.getStreet());
+                ad.setStreetNo(a.getStreetNo());
+                ad.setCity(a.getCity());
+                ad.setProvince(a.getProvince());
+                ad.setCountry(a.getCountry());
+                dto.setAddress(ad);
+            }
+        } catch (EntityNotFoundException | LazyInitializationException ex) {
+            dto.setAddress(null);
         }
 
         return dto;
