@@ -5,6 +5,9 @@ import { isValidCF } from "./utils/validators";
 const isProvince = (v) => /^[A-Z]{2}$/i.test(v);
 
 export default function App() {
+  // THEME
+  const [dark, setDark] = useState(false);
+
   // SEARCH BY CF
   const [cf, setCf] = useState("");
   const [person, setPerson] = useState(null);
@@ -208,16 +211,100 @@ export default function App() {
     }
   };
 
+  // ---------- THEME-DEPENDENT STYLES ----------
+  const bgColor = dark ? "#020617" : "#f5f7fa";
+  const fgColor = dark ? "#e5e7eb" : "#111827";
+  const cardBg = dark ? "#020617" : "white";
+  const cardBorder = dark ? "1px solid #1f2937" : "none";
+  const titleBg = dark ? "#111827" : "#e8eefc";
+  const titleColor = dark ? "#e5e7eb" : "#222";
+  const tableHeaderBg = dark ? "#111827" : "#4f6df5";
+  const tableHeaderColor = dark ? "#e5e7eb" : "white";
+  const tableRowBorder = dark ? "1px solid #111827" : "1px solid #eee";
+  const inputBg = dark ? "#020617" : "white";
+  const inputBorder = dark ? "1px solid #1f2937" : "1px solid #ccc";
+  const inputColor = dark ? "#e5e7eb" : "#111827";
+
+  const primaryButtonStyle = {
+    padding: "8px 18px",
+    backgroundImage: dark
+      ? "linear-gradient(135deg, #4f46e5, #06b6d4)"
+      : "linear-gradient(135deg, #6366f1, #a855f7)",
+    border: "1px solid rgba(255,255,255,0.25)",
+    color: "#ffffff",
+    borderRadius: 999,
+    cursor: "pointer",
+    fontWeight: 600,
+    fontSize: 14,
+    boxShadow: dark
+      ? "0 8px 24px rgba(15,23,42,0.9)"
+      : "0 8px 24px rgba(15,23,42,0.3)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    transition: "transform 0.1s ease, box-shadow 0.1s ease, background 0.3s ease",
+  };
+
+  const secondaryButtonStyle = {
+    padding: "8px 18px",
+    backgroundImage: dark
+      ? "linear-gradient(135deg, #f97373, #ef4444)"
+      : "linear-gradient(135deg, #f97373, #ef4444)",
+    border: "1px solid rgba(255,255,255,0.15)",
+    color: "#ffffff",
+    borderRadius: 999,
+    cursor: "pointer",
+    fontWeight: 600,
+    fontSize: 14,
+    boxShadow: dark
+      ? "0 8px 24px rgba(127,29,29,0.9)"
+      : "0 8px 24px rgba(127,29,29,0.4)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    transition: "transform 0.1s ease, box-shadow 0.1s ease, background 0.3s ease",
+  };
+
+  const sectionCardStyle = {
+    background: cardBg,
+    padding: 20,
+    borderRadius: 16,
+    boxShadow: dark
+      ? "0 18px 40px rgba(0,0,0,0.9)"
+      : "0 10px 30px rgba(15,23,42,0.15)",
+    marginBottom: 24,
+    border: cardBorder,
+    transition: "background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
+  };
+
+  const sectionTitleStyle = {
+    marginTop: 0,
+    marginBottom: 12,
+    color: titleColor,
+    background: titleBg,
+    padding: "10px 14px",
+    borderRadius: 10,
+    fontSize: 18,
+    fontWeight: 600,
+  };
+
+  const baseInputStyle = {
+    marginRight: 8,
+    padding: "8px 10px",
+    borderRadius: 8,
+    border: inputBorder,
+    minWidth: 220,
+    fontSize: 14,
+    backgroundColor: inputBg,
+    color: inputColor,
+    outline: "none",
+    transition: "background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease",
+  };
+
   const inputCreate = (name, placeholder, width = 220) => (
     <input
       style={{
+        ...baseInputStyle,
         width,
-        marginRight: 8,
         marginBottom: 8,
-        padding: "8px 10px",
-        borderRadius: 6,
-        border: "1px solid #ccc",
-        fontSize: 14,
       }}
       value={form[name]}
       onChange={(e) => setForm({ ...form, [name]: e.target.value })}
@@ -228,13 +315,9 @@ export default function App() {
   const inputEdit = (name, placeholder, width = 220) => (
     <input
       style={{
+        ...baseInputStyle,
         width,
-        marginRight: 8,
         marginBottom: 8,
-        padding: "8px 10px",
-        borderRadius: 6,
-        border: "1px solid #ccc",
-        fontSize: 14,
       }}
       value={edit[name]}
       onChange={(e) => setEdit({ ...edit, [name]: e.target.value })}
@@ -242,62 +325,55 @@ export default function App() {
     />
   );
 
-  const primaryButtonStyle = {
-    padding: "8px 16px",
-    background: "#4f6df5",
-    border: "none",
-    color: "white",
-    borderRadius: 6,
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: 14,
-  };
-
-  const secondaryButtonStyle = {
-    padding: "8px 16px",
-    background: "#e64545",
-    border: "none",
-    color: "white",
-    borderRadius: 6,
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: 14,
-  };
-
-  const sectionCardStyle = {
-    background: "white",
-    padding: 20,
-    borderRadius: 12,
-    boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
-    marginBottom: 24,
-  };
-
-  const sectionTitleStyle = {
-    marginTop: 0,
-    marginBottom: 12,
-    color: "#222",
-    background: "#e8eefc",
-    padding: "8px 12px",
-    borderRadius: 8,
-    fontSize: 18,
-  };
-
   const addr = person?.address || {};
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "#f5f7fa",
+        background: bgColor,
         display: "flex",
         justifyContent: "center",
         paddingTop: 40,
         paddingBottom: 40,
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        color: fgColor,
+        transition: "background-color 0.3s ease, color 0.3s ease",
       }}
     >
       <div style={{ width: "90%", maxWidth: 900 }}>
-        {/* ---- SEARCH BY CF ---- */}
+        {/* TOP BAR */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 24,
+          }}
+        >
+          <h1 style={{ margin: 0, fontSize: 24 }}>
+            Person Registry
+          </h1>
+          <button
+            onClick={() => setDark((d) => !d)}
+            style={{
+              ...primaryButtonStyle,
+              padding: "6px 14px",
+              fontSize: 13,
+              backgroundImage: dark
+                ? "linear-gradient(135deg, #0f172a, #1f2937)"
+                : "linear-gradient(135deg, #e5e7eb, #cbd5f5)",
+              color: dark ? "#e5e7eb" : "#111827",
+              boxShadow: dark
+                ? "0 4px 16px rgba(0,0,0,0.8)"
+                : "0 4px 16px rgba(148,163,184,0.8)",
+            }}
+          >
+            {dark ? "☀️ Light mode" : "🌙 Dark mode"}
+          </button>
+        </div>
+
+        {/* ---- SEARCH BY CF + BY NAME ---- */}
         <div style={sectionCardStyle}>
           <h2 style={sectionTitleStyle}>Search Person by Codice Fiscale</h2>
           <div style={{ marginBottom: 8 }}>
@@ -305,22 +381,26 @@ export default function App() {
               value={cf}
               onChange={(e) => setCf(e.target.value)}
               placeholder="Enter CF"
-              style={{
-                marginRight: 8,
-                padding: "8px 10px",
-                borderRadius: 6,
-                border: "1px solid #ccc",
-                minWidth: 220,
-                fontSize: 14,
-              }}
+              style={baseInputStyle}
             />
-            <button onClick={handleSearch} style={primaryButtonStyle}>
+            <button
+              onClick={handleSearch}
+              style={primaryButtonStyle}
+              onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+              onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            >
               Search
             </button>
           </div>
 
           {msg && (
-            <p style={{ color: msg.includes("✔") ? "green" : "red", marginTop: 8 }}>
+            <p
+              style={{
+                color: msg.includes("✔") ? "#22c55e" : dark ? "#f97373" : "#dc2626",
+                marginTop: 8,
+              }}
+            >
               {msg}
             </p>
           )}
@@ -332,16 +412,15 @@ export default function App() {
               value={nameQuery}
               onChange={(e) => setNameQuery(e.target.value)}
               placeholder="Enter name or surname"
-              style={{
-                marginRight: 8,
-                padding: "8px 10px",
-                borderRadius: 6,
-                border: "1px solid #ccc",
-                minWidth: 220,
-                fontSize: 14,
-              }}
+              style={baseInputStyle}
             />
-            <button onClick={handleSearchByName} style={primaryButtonStyle}>
+            <button
+              onClick={handleSearchByName}
+              style={primaryButtonStyle}
+              onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+              onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            >
               Search by name
             </button>
           </div>
@@ -353,7 +432,11 @@ export default function App() {
                 {nameResults.map((p) => (
                   <li key={p.taxCode}>
                     <span
-                      style={{ cursor: "pointer", textDecoration: "underline" }}
+                      style={{
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                        color: dark ? "#a5b4fc" : "#4f46e5",
+                      }}
                       onClick={() => {
                         setPerson(p);
                         setCf(p.taxCode);
@@ -372,7 +455,13 @@ export default function App() {
         {/* ----- ALL PERSONS TABLE ----- */}
         <div style={sectionCardStyle}>
           <h3 style={sectionTitleStyle}>All Persons</h3>
-          <button onClick={handleLoadAll} style={primaryButtonStyle}>
+          <button
+            onClick={handleLoadAll}
+            style={primaryButtonStyle}
+            onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+            onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
             Load all persons
           </button>
 
@@ -382,112 +471,80 @@ export default function App() {
                 marginTop: 12,
                 width: "100%",
                 borderCollapse: "collapse",
-                background: "white",
-                borderRadius: 10,
+                background: cardBg,
+                borderRadius: 12,
                 overflow: "hidden",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
                 fontSize: 14,
+                transition: "background-color 0.3s ease",
               }}
             >
               <thead>
                 <tr>
-                  <th
-                    style={{
-                      padding: "10px",
-                      background: "#4f6df5",
-                      color: "white",
-                      fontWeight: "normal",
-                      textAlign: "left",
-                    }}
-                  >
-                    CF
-                  </th>
-                  <th
-                    style={{
-                      padding: "10px",
-                      background: "#4f6df5",
-                      color: "white",
-                      fontWeight: "normal",
-                      textAlign: "left",
-                    }}
-                  >
-                    Name
-                  </th>
-                  <th
-                    style={{
-                      padding: "10px",
-                      background: "#4f6df5",
-                      color: "white",
-                      fontWeight: "normal",
-                      textAlign: "left",
-                    }}
-                  >
-                    Surname
-                  </th>
-                  <th
-                    style={{
-                      padding: "10px",
-                      background: "#4f6df5",
-                      color: "white",
-                      fontWeight: "normal",
-                      textAlign: "left",
-                    }}
-                  >
-                    City
-                  </th>
-                  <th
-                    style={{
-                      padding: "10px",
-                      background: "#4f6df5",
-                      color: "white",
-                      fontWeight: "normal",
-                      textAlign: "left",
-                    }}
-                  >
-                    Province
-                  </th>
-                  <th
-                    style={{
-                      padding: "10px",
-                      background: "#4f6df5",
-                      color: "white",
-                      fontWeight: "normal",
-                      textAlign: "left",
-                    }}
-                  >
-                    Country
-                  </th>
+                  {["CF", "Name", "Surname", "City", "Province", "Country"].map((h) => (
+                    <th
+                      key={h}
+                      style={{
+                        padding: "10px",
+                        background: tableHeaderBg,
+                        color: tableHeaderColor,
+                        fontWeight: 500,
+                        textAlign: "left",
+                      }}
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {allPersons.map((p) => {
+                {allPersons.map((p, idx) => {
                   const a = p.address || {};
+                  const rowBg =
+                    dark && idx % 2 === 1
+                      ? "#020617"
+                      : dark
+                      ? "#020617"
+                      : idx % 2 === 0
+                      ? "#ffffff"
+                      : "#f9fafb";
                   return (
                     <tr
                       key={p.taxCode}
-                      style={{ cursor: "pointer" }}
+                      style={{
+                        cursor: "pointer",
+                        backgroundColor: rowBg,
+                        transition: "background-color 0.2s ease",
+                      }}
                       onClick={() => {
                         setPerson(p);
                         setCf(p.taxCode);
                         fillEditFromDto(p);
                       }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = dark
+                          ? "#111827"
+                          : "#e0e7ff";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = rowBg;
+                      }}
                     >
-                      <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
+                      <td style={{ padding: "10px", borderBottom: tableRowBorder }}>
                         {p.taxCode}
                       </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
+                      <td style={{ padding: "10px", borderBottom: tableRowBorder }}>
                         {p.name}
                       </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
+                      <td style={{ padding: "10px", borderBottom: tableRowBorder }}>
                         {p.surname}
                       </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
+                      <td style={{ padding: "10px", borderBottom: tableRowBorder }}>
                         {a.city || ""}
                       </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
+                      <td style={{ padding: "10px", borderBottom: tableRowBorder }}>
                         {a.province || ""}
                       </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
+                      <td style={{ padding: "10px", borderBottom: tableRowBorder }}>
                         {a.country || ""}
                       </td>
                     </tr>
@@ -535,10 +592,22 @@ export default function App() {
               </div>
             </div>
             <div style={{ marginTop: 12 }}>
-              <button onClick={handleUpdate} style={{ ...primaryButtonStyle, marginRight: 8 }}>
+              <button
+                onClick={handleUpdate}
+                style={{ ...primaryButtonStyle, marginRight: 8 }}
+                onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+                onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              >
                 Update
               </button>
-              <button onClick={handleDelete} style={secondaryButtonStyle}>
+              <button
+                onClick={handleDelete}
+                style={secondaryButtonStyle}
+                onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+                onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              >
                 Delete
               </button>
             </div>
@@ -563,7 +632,13 @@ export default function App() {
               {inputCreate("country", "Country")}
             </div>
           </div>
-          <button onClick={handleCreate} style={{ ...primaryButtonStyle, marginTop: 8 }}>
+          <button
+            onClick={handleCreate}
+            style={{ ...primaryButtonStyle, marginTop: 8 }}
+            onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+            onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
             Save
           </button>
         </div>
